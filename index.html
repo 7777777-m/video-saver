@@ -557,7 +557,11 @@ async function parseVideo() {
         progressText.textContent = '✅ 解析完成';
 
     } catch (err) {
-        showError(`解析失败：${err.message}\n\n请确认：\n1. 链接是否有效\n2. 网络是否正常\n3. 稍后重试`);
+        if (err.message.includes('Failed to fetch') || err.name === 'TypeError') {
+            showError(`⚠️ 网络请求被阻止（可能是CORS限制）\n\n解决方法：\n1. 打开 https://corsproxy.io/ 作为代理\n2. 或者联系我部署一个后端服务`);
+        } else {
+            showError(`解析失败：${err.message}\n\n请确认：\n1. 链接是否有效\n2. 网络是否正常\n3. 稍后重试`);
+        }
     } finally {
         setTimeout(() => setLoading(false), 800);
     }
