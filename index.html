@@ -380,9 +380,15 @@
 
 <script>
 // ============================================================
-// 配置
+// 配置 — 自动选择最佳 API 路径
 // ============================================================
-const API_BASE = 'https://api.douyin.wtf';
+// 如果是通过一体化服务器访问（localhost/局域网IP），用内置代理（无CORS问题）
+// 如果是通过 GitHub Pages 访问，直连 API（可能有CORS限制）
+const isLocalServer = location.hostname === 'localhost' ||
+                      location.hostname.startsWith('192.168.') ||
+                      location.hostname.startsWith('10.') ||
+                      location.hostname.startsWith('172.');
+const API_BASE = isLocalServer ? '' : 'https://api.douyin.wtf';
 
 let videoData = null;
 
@@ -499,16 +505,28 @@ async function parseVideo() {
     saveBtn.style.display = 'none';
 
     try {
-        // 调用 API
-        const apiUrl = `${API_BASE}/api/hybrid/video_data`;
+        // 调用 API（使用 GET 请求，兼容 CORS 代理）
+        const encodedUrl = encodeURIComponent(url);
+        let apiUrl = `${API_BASE}/api/hybrid/video_data?url=${encodedUrl}`;
         progressText.textContent = '正在请求解析...';
         progressFill.style.width = '40%';
 
-        const resp = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, minimal: false }),
-        });
+        let resp = await fetch(apiUrl);
+
+        // 如果直连被 CORS 阻止，尝试通过公共代理
+        if (!resp.ok && resp.type === 'opaque') {
+            // CORS blocked, try proxy
+            apiUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+            resp = await fetch(apiUrl);
+        }
+
+        // 如果 corsproxy.io 也不可用，尝试 allorigins
+        if (!resp.ok) {
+            apiUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(
+                `${API_BASE || 'https://api.douyin.wtf'}/api/hybrid/video_data?url=${encodedUrl}`
+            )}`;
+            resp = await fetch(apiUrl);
+        }
 
         progressFill.style.width = '70%';
         progressText.textContent = '正在解析视频信息...';
