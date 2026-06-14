@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="视频下载">
+    <title>抖音/TikTok 无水印下载</title>
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --card: #ffffff;
+            --text: #1d1d1f;
+            --sub: #86868b;
+            --accent: #ff6b35;
+            --accent2: #0071e3;
+            --border: #e5e5ea;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 0 20px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .header p {
+            color: var(--sub);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Input */
+        .input-area {
+            position: relative;
+        }
+        .input-area textarea {
+            width: 100%;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            padding-right: 80px;
+            font-size: 15px;
+            color: var(--text);
+            background: #fafafa;
+            resize: none;
+            height: 90px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .input-area textarea:focus {
+            border-color: var(--accent);
+            background: #fff;
+        }
+        .paste-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f0f0f5;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .paste-btn:active {
+            background: #e0e0e5;
+        }
+
+        /* Button */
+        .btn {
+            display: block;
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+            margin-top: 12px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:active {
+            background: #e55a2b;
+            transform: scale(0.98);
+        }
+        .btn-primary:disabled {
+            background: #ffb899;
+        }
+        .btn-secondary {
+            background: var(--accent2);
+            color: #fff;
+            margin-top: 8px;
+        }
+        .btn-secondary:active {
+            background: #0066cc;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Result */
+        .result {
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .video-preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 12px;
+        }
+        .video-preview img {
+            width: 100%;
+            display: block;
+        }
+        .video-preview video {
+            width: 100%;
+            display: block;
+            max-height: 300px;
+        }
+        .play-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.25);
+        }
+        .play-overlay span {
+            font-size: 48px;
+        }
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .info-row .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #eee;
+        }
+        .info-row .author {
+            font-size: 14px;
+            color: var(--sub);
+        }
+        .info-row .title {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Progress */
+        .progress-wrap {
+            display: none;
+            margin-top: 12px;
+        }
+        .progress-wrap.show {
+            display: block;
+        }
+        .progress-bar {
+            height: 6px;
+            background: #e5e5ea;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.2s;
+        }
+        .progress-text {
+            text-align: center;
+            font-size: 13px;
+            color: var(--sub);
+            margin-top: 6px;
+        }
+
+        /* Tips */
+        .tips {
+            display: none;
+            background: #fff3e0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #e65100;
+            line-height: 1.8;
+        }
+        .tips.show {
+            display: block;
+        }
+
+        /* Error */
+        .error {
+            display: none;
+            background: #ffebee;
+            color: #c62828;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .error.show {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #bbb;
+            font-size: 12px;
+            padding: 20px;
+        }
+
+        /* PWA install banner */
+        .install-banner {
+            display: none;
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 16px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .install-banner.show {
+            display: block;
+        }
+        .install-banner p {
+            font-size: 13px;
+            color: var(--sub);
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>📹 视频下载器</h1>
+        <p>支持抖音 · TikTok 无水印下载</p>
+    </div>
+
+    <!-- Input Card -->
+    <div class="card">
+        <div class="input-area">
+            <textarea id="linkInput" placeholder="粘贴抖音/TikTok 分享链接到这里..."></textarea>
+            <button class="paste-btn" onclick="pasteLink()">📋 粘贴</button>
+        </div>
+
+        <button class="btn btn-primary" id="parseBtn" onclick="parseVideo()">
+            🔍 解析视频
+        </button>
+
+        <!-- Progress -->
+        <div class="progress-wrap" id="progressWrap">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-text" id="progressText">正在解析...</p>
+        </div>
+
+        <!-- Error -->
+        <div class="error" id="errorMsg"></div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="card result" id="resultCard">
+        <div class="video-preview" id="videoPreview">
+            <img id="coverImg" src="" alt="" style="width:100%">
+            <video id="videoPlayer" controls style="display:none" playsinline></video>
+        </div>
+        <div class="info-row">
+            <img class="avatar" id="authorAvatar" src="" alt="">
+            <span class="author" id="authorName"></span>
+        </div>
+        <p class="title" id="videoTitle"></p>
+
+        <button class="btn btn-primary" id="downloadBtn" onclick="downloadVideo()">
+            ⬇️ 下载并查看
+        </button>
+        <button class="btn btn-secondary" id="saveBtn" style="display:none" onclick="retrySave()">
+            💾 重新保存
+        </button>
+    </div>
+
+    <!-- Save Tips -->
+    <div class="tips" id="saveTips">
+        💡 <b>保存到相册方法：</b><br>
+        视频打开后，点右下角 <b>分享按钮 ↑</b> → 选择 <b>「存储视频」</b> 即可保存到相册
+    </div>
+
+    <!-- Install Banner -->
+    <div class="install-banner" id="installBanner">
+        <p>💡 添加到主屏幕，像 App 一样使用</p>
+        <button class="btn btn-secondary" onclick="showInstallTip()">
+            📲 如何添加？
+        </button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>

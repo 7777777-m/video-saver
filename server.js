@@ -66,6 +66,8 @@ const server = http.createServer((req, res) => {
                 });
             });
 
+            console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${url.pathname}${url.search}`);
+
             proxyReq.on('error', (err) => {
                 console.error('代理错误:', err.message);
                 res.writeHead(502, { 'Content-Type': 'application/json' });

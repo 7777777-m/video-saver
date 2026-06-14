@@ -8,342 +8,63 @@
     <meta name="apple-mobile-web-app-title" content="视频下载">
     <title>抖音/TikTok 无水印下载</title>
     <style>
-        :root {
-            --bg: #f5f5f7;
-            --card: #ffffff;
-            --text: #1d1d1f;
-            --sub: #86868b;
-            --accent: #ff6b35;
-            --accent2: #0071e3;
-            --border: #e5e5ea;
-            --shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
+        :root { --bg:#f5f5f7; --card:#fff; --text:#1d1d1f; --sub:#86868b; --accent:#ff6b35; --border:#e5e5ea; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-        }
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 20px 16px 40px;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 30px 0 20px;
-        }
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        .header p {
-            color: var(--sub);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        /* Card */
-        .card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        /* Input */
-        .input-area {
-            position: relative;
-        }
-        .input-area textarea {
-            width: 100%;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            padding-right: 80px;
-            font-size: 15px;
-            color: var(--text);
-            background: #fafafa;
-            resize: none;
-            height: 90px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-            outline: none;
-        }
-        .input-area textarea:focus {
-            border-color: var(--accent);
-            background: #fff;
-        }
-        .paste-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #f0f0f5;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: #555;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .paste-btn:active {
-            background: #e0e0e5;
-        }
-
-        /* Button */
-        .btn {
-            display: block;
-            width: 100%;
-            border: none;
-            border-radius: 12px;
-            padding: 15px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.15s;
-            margin-top: 12px;
-        }
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-        }
-        .btn-primary:active {
-            background: #e55a2b;
-            transform: scale(0.98);
-        }
-        .btn-primary:disabled {
-            background: #ffb899;
-        }
-        .btn-secondary {
-            background: var(--accent2);
-            color: #fff;
-            margin-top: 8px;
-        }
-        .btn-secondary:active {
-            background: #0066cc;
-        }
-
-        /* Spinner */
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2.5px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            vertical-align: middle;
-            margin-right: 6px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Result */
-        .result {
-            display: none;
-        }
-        .result.show {
-            display: block;
-        }
-        .video-preview {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-            margin-bottom: 12px;
-        }
-        .video-preview img {
-            width: 100%;
-            display: block;
-        }
-        .video-preview video {
-            width: 100%;
-            display: block;
-            max-height: 300px;
-        }
-        .play-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.25);
-        }
-        .play-overlay span {
-            font-size: 48px;
-        }
-        .info-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .info-row .avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: #eee;
-        }
-        .info-row .author {
-            font-size: 14px;
-            color: var(--sub);
-        }
-        .info-row .title {
-            font-size: 16px;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 24px;
-            font-size: 15px;
-            font-weight: 500;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 999;
-        }
-        .toast.show {
-            opacity: 1;
-        }
-
-        /* Progress */
-        .progress-wrap {
-            display: none;
-            margin-top: 12px;
-        }
-        .progress-wrap.show {
-            display: block;
-        }
-        .progress-bar {
-            height: 6px;
-            background: #e5e5ea;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.2s;
-        }
-        .progress-text {
-            text-align: center;
-            font-size: 13px;
-            color: var(--sub);
-            margin-top: 6px;
-        }
-
-        /* Tips */
-        .tips {
-            display: none;
-            background: #fff3e0;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
-            font-size: 13px;
-            color: #e65100;
-            line-height: 1.8;
-        }
-        .tips.show {
-            display: block;
-        }
-
-        /* Error */
-        .error {
-            display: none;
-            background: #ffebee;
-            color: #c62828;
-            border-radius: 12px;
-            padding: 14px;
-            margin-top: 12px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .error.show {
-            display: block;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            color: #bbb;
-            font-size: 12px;
-            padding: 20px;
-        }
-
-        /* PWA install banner */
-        .install-banner {
-            display: none;
-            background: #fff;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-top: 16px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-        .install-banner.show {
-            display: block;
-        }
-        .install-banner p {
-            font-size: 13px;
-            color: var(--sub);
-            margin-bottom: 8px;
-        }
+        body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-tap-highlight-color:transparent; }
+        .container { max-width:480px; margin:0 auto; padding:20px 16px 60px; }
+        .header { text-align:center; padding:24px 0 16px; }
+        .header h1 { font-size:26px; font-weight:700; }
+        .header p { color:var(--sub); font-size:14px; margin-top:4px; }
+        .card { background:var(--card); border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+        textarea { width:100%; border:2px solid var(--border); border-radius:12px; padding:12px; font-size:15px; resize:none; height:88px; font-family:inherit; outline:none; background:#fafafa; }
+        textarea:focus { border-color:var(--accent); background:#fff; }
+        .btn { display:block; width:100%; border:none; border-radius:12px; padding:14px; font-size:16px; font-weight:600; cursor:pointer; text-align:center; margin-top:10px; }
+        .btn-primary { background:var(--accent); color:#fff; }
+        .btn-primary:active { background:#e55a2b; transform:scale(0.98); }
+        .btn-primary:disabled { background:#ffb899; }
+        .spinner { display:inline-block; width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; vertical-align:middle; margin-right:6px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .result { display:none; }
+        .result.show { display:block; }
+        .video-preview { border-radius:12px; overflow:hidden; background:#000; margin-bottom:10px; }
+        .video-preview img,.video-preview video { width:100%; display:block; }
+        .video-preview video { max-height:320px; }
+        .info-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+        .info-row .avatar { width:28px; height:28px; border-radius:50%; }
+        .info-row .author { font-size:14px; color:var(--sub); }
+        .title { font-size:15px; font-weight:600; line-height:1.4; margin-bottom:4px; }
+        .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:12px 24px; border-radius:24px; font-size:15px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:999; }
+        .toast.show { opacity:1; }
+        .progress-wrap { display:none; margin-top:10px; }
+        .progress-wrap.show { display:block; }
+        .progress-bar { height:6px; background:#e5e5ea; border-radius:3px; overflow:hidden; }
+        .progress-fill { height:100%; background:var(--accent); border-radius:3px; width:0%; transition:width .2s; }
+        .progress-text { text-align:center; font-size:13px; color:var(--sub); margin-top:6px; }
+        .error { display:none; background:#ffebee; color:#c62828; border-radius:12px; padding:12px; margin-top:10px; font-size:13px; }
+        .error.show { display:block; }
+        .tips { display:none; background:#fff3e0; border-radius:12px; padding:14px; margin-top:12px; font-size:13px; color:#e65100; line-height:1.8; }
+        .tips.show { display:block; }
+        .api-badge { font-size:11px; color:var(--sub); text-align:center; margin-top:4px; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <!-- Header -->
     <div class="header">
         <h1>📹 视频下载器</h1>
         <p>支持抖音 · TikTok 无水印下载</p>
     </div>
-
-    <!-- Input Card -->
     <div class="card">
-        <div class="input-area">
-            <textarea id="linkInput" placeholder="粘贴抖音/TikTok 分享链接到这里..."></textarea>
-            <button class="paste-btn" onclick="pasteLink()">📋 粘贴</button>
-        </div>
-
-        <button class="btn btn-primary" id="parseBtn" onclick="parseVideo()">
-            🔍 解析视频
-        </button>
-
-        <!-- Progress -->
+        <textarea id="linkInput" placeholder="粘贴抖音/TikTok 分享链接到这里..."></textarea>
+        <button class="btn btn-primary" id="parseBtn" onclick="parseVideo()">🔍 解析视频</button>
         <div class="progress-wrap" id="progressWrap">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <p class="progress-text" id="progressText">正在解析...</p>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <p class="progress-text" id="progressText"></p>
         </div>
-
-        <!-- Error -->
         <div class="error" id="errorMsg"></div>
     </div>
-
-    <!-- Result Card -->
     <div class="card result" id="resultCard">
-        <div class="video-preview" id="videoPreview">
-            <img id="coverImg" src="" alt="" style="width:100%">
+        <div class="video-preview">
+            <img id="coverImg" src="" alt="">
             <video id="videoPlayer" controls style="display:none" playsinline></video>
         </div>
         <div class="info-row">
@@ -351,380 +72,224 @@
             <span class="author" id="authorName"></span>
         </div>
         <p class="title" id="videoTitle"></p>
-
-        <button class="btn btn-primary" id="downloadBtn" onclick="downloadVideo()">
-            ⬇️ 下载并查看
-        </button>
-        <button class="btn btn-secondary" id="saveBtn" style="display:none" onclick="retrySave()">
-            💾 重新保存
-        </button>
+        <p class="api-badge" id="apiBadge"></p>
+        <button class="btn btn-primary" id="downloadBtn" onclick="downloadVideo()">⬇️ 下载视频</button>
     </div>
-
-    <!-- Save Tips -->
     <div class="tips" id="saveTips">
-        💡 <b>保存到相册方法：</b><br>
-        视频打开后，点右下角 <b>分享按钮 ↑</b> → 选择 <b>「存储视频」</b> 即可保存到相册
-    </div>
-
-    <!-- Install Banner -->
-    <div class="install-banner" id="installBanner">
-        <p>💡 添加到主屏幕，像 App 一样使用</p>
-        <button class="btn btn-secondary" onclick="showInstallTip()">
-            📲 如何添加？
-        </button>
+        💡 <b>保存到相册：</b>视频下载后 → 长按视频 → <b>「保存视频」</b>，或点右下角 <b>分享 ↑</b> → <b>「存储视频」</b>
     </div>
 </div>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// 配置 — 自动选择最佳 API 路径
-// ============================================================
-// 如果是通过一体化服务器访问（localhost/局域网IP），用内置代理（无CORS问题）
-// 如果是通过 GitHub Pages 访问，直连 API（可能有CORS限制）
-const isLocalServer = location.hostname === 'localhost' ||
-                      location.hostname.startsWith('192.168.') ||
-                      location.hostname.startsWith('10.') ||
-                      location.hostname.startsWith('172.');
-const API_BASE = isLocalServer ? '' : 'https://api.douyin.wtf';
-
-let videoData = null;
-
-// ============================================================
 // DOM 引用
-// ============================================================
-const $ = id => document.getElementById(id);
-const linkInput = $('linkInput');
-const parseBtn = $('parseBtn');
-const progressWrap = $('progressWrap');
-const progressFill = $('progressFill');
-const progressText = $('progressText');
-const errorMsg = $('errorMsg');
-const resultCard = $('resultCard');
-const videoPreview = $('videoPreview');
-const coverImg = $('coverImg');
-const videoPlayer = $('videoPlayer');
-const authorAvatar = $('authorAvatar');
-const authorName = $('authorName');
-const videoTitle = $('videoTitle');
-const saveTips = $('saveTips');
-const saveBtn = $('saveBtn');
-const installBanner = $('installBanner');
-const toast = $('toast');
+var linkInput=document.getElementById('linkInput');
+var parseBtn=document.getElementById('parseBtn');
+var progressWrap=document.getElementById('progressWrap');
+var progressFill=document.getElementById('progressFill');
+var progressText=document.getElementById('progressText');
+var errorMsg=document.getElementById('errorMsg');
+var resultCard=document.getElementById('resultCard');
+var coverImg=document.getElementById('coverImg');
+var videoPlayer=document.getElementById('videoPlayer');
+var authorAvatar=document.getElementById('authorAvatar');
+var authorName=document.getElementById('authorName');
+var videoTitle=document.getElementById('videoTitle');
+var apiBadge=document.getElementById('apiBadge');
+var saveTips=document.getElementById('saveTips');
+var downloadBtn=document.getElementById('downloadBtn');
+var toast=document.getElementById('toast');
 
-// ============================================================
-// 工具函数
-// ============================================================
-function showToast(msg, duration = 2000) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), duration);
-}
+var videoData=null;
 
-function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.classList.add('show');
-    setTimeout(() => errorMsg.classList.remove('show'), 15000);
-}
+// 是否是本地服务器
+var isLocal = location.hostname==='localhost'||
+  location.hostname.indexOf('192.168.')===0||
+  location.hostname.indexOf('10.')===0||
+  location.hostname.indexOf('172.')===0;
 
-function hideError() {
-    errorMsg.classList.remove('show');
-}
-
-function setLoading(loading, text = '正在解析...') {
-    if (loading) {
-        parseBtn.disabled = true;
-        parseBtn.innerHTML = '<span class="spinner"></span>' + text;
-        progressWrap.classList.add('show');
-        progressText.textContent = text;
-        progressFill.style.width = '30%';
-    } else {
-        parseBtn.disabled = false;
-        parseBtn.innerHTML = '🔍 解析视频';
-        progressWrap.classList.remove('show');
+// 多个 API 源（自动 fallback）
+var API_SOURCES=[
+  {
+    name:'tikwm.com',
+    buildUrl:function(u){return 'api/?url='+encodeURIComponent(u);},
+    base:'https://www.tikwm.com',
+    parse:function(j){
+      if(j.code!==0||!j.data)return null;
+      var d=j.data;
+      return {
+        title:d.title||'',
+        author:(d.author&&(d.author.nickname||d.author.unique_id))||'',
+        avatar:(d.author&&d.author.avatar)||'',
+        cover:d.cover||d.origin_cover||'',
+        videoUrl:d.play||d.hdplay||'',
+        duration:d.duration||0
+      };
     }
-}
-
-function extractUrl(text) {
-    const patterns = [
-        /https?:\/\/v\.douyin\.com\/[A-Za-z0-9]+\/?/,
-        /https?:\/\/www\.douyin\.com\/[^\s]+/,
-        /https?:\/\/www\.iesdouyin\.com\/[^\s]+/,
-        /https?:\/\/vm\.tiktok\.com\/[A-Za-z0-9]+\/?/,
-        /https?:\/\/www\.tiktok\.com\/[^\s]+/,
-        /https?:\/\/[^\s]*douyin[^\s]*/i,
-        /https?:\/\/[^\s]*tiktok[^\s]*/i,
-    ];
-    for (const p of patterns) {
-        const m = text.match(p);
-        if (m) return m[0];
+  },
+  {
+    name:'douyin.wtf',
+    buildUrl:function(u){return 'api/hybrid/video_data?url='+encodeURIComponent(u);},
+    base:'https://api.douyin.wtf',
+    parse:function(j){
+      var d=(j.data&&j.data.hybrid&&j.data.hybrid.video_data)||j.data;
+      if(!d)return null;
+      return {
+        title:d.title||'',
+        author:d.nickname||(d.author&&d.author.nickname)||'',
+        avatar:d.avatar||(d.author&&d.author.avatar)||'',
+        cover:d.cover||'',
+        videoUrl:d.video_url||d.play||d.download_url||'',
+        duration:d.duration||0
+      };
     }
-    return null;
+  }
+];
+
+// fetch 包装
+function apiFetch(source,path){
+  // 本地服务器：走内置代理（无 CORS 问题）
+  if(isLocal){
+    return fetch('/'+path).then(function(r){
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      return r.json();
+    });
+  }
+  // 在线：直连
+  var directUrl=source.base+'/'+path;
+  return fetch(directUrl).then(function(r){
+    if(r.ok)return r.json();
+    throw new Error('HTTP '+r.status);
+  }).catch(function(e){
+    console.warn(source.name+' 直连失败:',e.message);
+    // CORS 回退
+    return fetch('https://corsproxy.io/?'+encodeURIComponent(directUrl)).then(function(r){
+      if(r.ok)return r.json();
+      throw new Error('HTTP '+r.status);
+    });
+  });
 }
 
-// ============================================================
-// 剪贴板粘贴
-// ============================================================
-async function pasteLink() {
-    try {
-        const text = await navigator.clipboard.readText();
-        if (text) {
-            linkInput.value = text;
-            showToast('✅ 已粘贴');
-        } else {
-            showToast('剪贴板为空');
-        }
-    } catch {
-        // iOS Safari 可能不支持 clipboard API
-        showToast('请手动粘贴链接');
-    }
+// 提取 URL
+function extractUrl(text){
+  var ps=[
+    /https?:\/\/v\.douyin\.com\/[A-Za-z0-9]+\/?/,
+    /https?:\/\/www\.douyin\.com\/[^\s]+/,
+    /https?:\/\/www\.iesdouyin\.com\/[^\s]+/,
+    /https?:\/\/vm\.tiktok\.com\/[A-Za-z0-9]+\/?/,
+    /https?:\/\/www\.tiktok\.com\/[^\s]+/,
+    /https?:\/\/[^\s]*douyin[^\s]*/i,
+    /https?:\/\/[^\s]*tiktok[^\s]*/i
+  ];
+  for(var i=0;i<ps.length;i++){var m=text.match(ps[i]);if(m)return m[0];}
+  return null;
 }
 
-// ============================================================
 // 解析视频
-// ============================================================
-async function parseVideo() {
-    const rawText = linkInput.value.trim();
-    if (!rawText) {
-        showError('请先粘贴抖音或 TikTok 的分享链接');
-        return;
+function parseVideo(){
+  var raw=linkInput.value.trim();
+  if(!raw){showErr('请先粘贴链接');return;}
+  var url=extractUrl(raw);
+  if(!url){showErr('未识别到有效的抖音/TikTok 链接');return;}
+
+  hideErr();setLoading(true,'正在解析...');
+  resultCard.classList.remove('show');saveTips.classList.remove('show');
+
+  var lastErr='';
+  function tryNext(index){
+    if(index>=API_SOURCES.length){
+      showErr('所有 API 均失败:\n'+lastErr+'\n\n请确认链接有效后重试');
+      setLoading(false);
+      return;
     }
+    var src=API_SOURCES[index];
+    progressText.textContent='正在通过 '+src.name+' 解析...';
+    progressFill.style.width=(30+index*30)+'%';
 
-    const url = extractUrl(rawText);
-    if (!url) {
-        showError('未识别到有效链接，请确认是抖音/TikTok 的分享链接');
-        return;
-    }
-
-    hideError();
-    setLoading(true);
-    resultCard.classList.remove('show');
-    saveTips.classList.remove('show');
-    saveBtn.style.display = 'none';
-
-    try {
-        // 调用 API（使用 GET 请求，兼容 CORS 代理）
-        const encodedUrl = encodeURIComponent(url);
-        let apiUrl = `${API_BASE}/api/hybrid/video_data?url=${encodedUrl}`;
-        progressText.textContent = '正在请求解析...';
-        progressFill.style.width = '40%';
-
-        let resp = await fetch(apiUrl);
-
-        // 如果直连被 CORS 阻止，尝试通过公共代理
-        if (!resp.ok && resp.type === 'opaque') {
-            // CORS blocked, try proxy
-            apiUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
-            resp = await fetch(apiUrl);
-        }
-
-        // 如果 corsproxy.io 也不可用，尝试 allorigins
-        if (!resp.ok) {
-            apiUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(
-                `${API_BASE || 'https://api.douyin.wtf'}/api/hybrid/video_data?url=${encodedUrl}`
-            )}`;
-            resp = await fetch(apiUrl);
-        }
-
-        progressFill.style.width = '70%';
-        progressText.textContent = '正在解析视频信息...';
-
-        if (!resp.ok) {
-            throw new Error(`服务器返回 ${resp.status}`);
-        }
-
-        const json = await resp.json();
-
-        // 解析多种返回格式
-        let info = null;
-        const data = json.data;
-
-        if (data?.hybrid?.video_data) {
-            const v = data.hybrid.video_data;
-            info = {
-                title: v.title || '未知标题',
-                author: v.nickname || '未知作者',
-                avatar: v.avatar || '',
-                cover: v.cover || '',
-                videoUrl: v.video_url || '',
-                duration: v.duration || 0,
-            };
-        } else if (data) {
-            info = {
-                title: data.title || '未知标题',
-                author: data.author?.nickname || '未知作者',
-                avatar: data.author?.avatar || '',
-                cover: data.cover || '',
-                videoUrl: data.download_url ||
-                         data.video?.download_addr?.url_list?.[0] ||
-                         data.video?.play_addr?.url_list?.[0] || '',
-                duration: data.video?.duration || 0,
-            };
-        }
-
-        if (!info || !info.videoUrl) {
-            throw new Error('未找到无水印视频地址，请确认链接有效');
-        }
-
-        videoData = info;
-        showResult(info);
-
-        progressFill.style.width = '100%';
-        progressText.textContent = '✅ 解析完成';
-
-    } catch (err) {
-        if (err.message.includes('Failed to fetch') || err.name === 'TypeError') {
-            showError(`⚠️ 网络请求被阻止（可能是CORS限制）\n\n解决方法：\n1. 打开 https://corsproxy.io/ 作为代理\n2. 或者联系我部署一个后端服务`);
-        } else {
-            showError(`解析失败：${err.message}\n\n请确认：\n1. 链接是否有效\n2. 网络是否正常\n3. 稍后重试`);
-        }
-    } finally {
-        setTimeout(() => setLoading(false), 800);
-    }
+    apiFetch(src,src.buildUrl(url)).then(function(json){
+      var info=src.parse(json);
+      if(info&&info.videoUrl){
+        videoData=info;
+        showResult(info,src.name);
+        progressFill.style.width='100%';
+        progressText.textContent='✅ 解析完成';
+        setTimeout(function(){setLoading(false);},600);
+      }else{
+        lastErr=src.name+': 未获取到视频';
+        tryNext(index+1);
+      }
+    }).catch(function(e){
+      lastErr=src.name+': '+e.message;
+      console.warn(lastErr);
+      tryNext(index+1);
+    });
+  }
+  tryNext(0);
 }
 
-// ============================================================
-// 显示解析结果
-// ============================================================
-function showResult(info) {
-    // 封面图
-    if (info.cover) {
-        coverImg.src = info.cover;
-        coverImg.style.display = 'block';
-    } else {
-        coverImg.style.display = 'none';
-    }
-    videoPlayer.style.display = 'none';
-
-    // 作者信息
-    if (info.avatar) {
-        authorAvatar.src = info.avatar;
-        authorAvatar.style.display = 'block';
-    } else {
-        authorAvatar.style.display = 'none';
-    }
-    authorName.textContent = '@' + info.author;
-    videoTitle.textContent = info.title;
-
-    resultCard.classList.add('show');
-    installBanner.classList.add('show');
+// 显示结果
+function showResult(info,srcName){
+  if(info.cover){coverImg.src=info.cover;coverImg.style.display='block';videoPlayer.style.display='none';}
+  if(info.avatar){authorAvatar.src=info.avatar;}
+  authorName.textContent='@'+info.author;
+  videoTitle.textContent=info.title;
+  apiBadge.textContent='🔗 '+srcName;
+  resultCard.classList.add('show');
+  downloadBtn.innerHTML='⬇️ 下载视频';
+  downloadBtn.disabled=false;
 }
 
-// ============================================================
 // 下载视频
-// ============================================================
-async function downloadVideo() {
-    if (!videoData || !videoData.videoUrl) {
-        showError('没有可下载的视频');
-        return;
-    }
+function downloadVideo(){
+  if(!videoData||!videoData.videoUrl){showErr('没有可下载的视频');return;}
 
-    const downloadBtn = $('downloadBtn');
-    downloadBtn.disabled = true;
-    downloadBtn.innerHTML = '<span class="spinner"></span>正在准备...';
-    saveTips.classList.remove('show');
+  downloadBtn.disabled=true;
+  downloadBtn.innerHTML='<span class="spinner"></span>正在下载...';
+  saveTips.classList.remove('show');
 
-    try {
-        // 方案1：直接在新窗口打开视频（iOS Safari 原生播放器可保存）
-        const videoUrl = videoData.videoUrl;
+  fetch(videoData.videoUrl).then(function(resp){
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    return resp.blob();
+  }).then(function(blob){
+    var blobUrl=URL.createObjectURL(blob);
+    videoPlayer.src=blobUrl;
+    videoPlayer.style.display='block';
+    coverImg.style.display='none';
 
-        // 先尝试 fetch 看看能不能拿到
-        const testResp = await fetch(videoUrl, { method: 'HEAD' });
+    var a=document.createElement('a');
+    a.href=blobUrl;
+    a.download=(videoData.author+'_'+videoData.title+'.mp4').replace(/[<>:"/\\|?*]/g,'_').substring(0,200);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
-        // 直接用 blob 下载
-        downloadBtn.innerHTML = '<span class="spinner"></span>正在下载...';
-
-        const resp = await fetch(videoUrl);
-        if (!resp.ok) throw new Error('下载失败');
-
-        const blob = await resp.blob();
-        const blobUrl = URL.createObjectURL(blob);
-
-        // 创建下载链接
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = `${videoData.author}_${videoData.title}.mp4`.replace(/[<>:"/\\|?*]/g, '_');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        // 同时在页面显示视频便于保存
-        videoPlayer.src = blobUrl;
-        videoPlayer.style.display = 'block';
-        coverImg.style.display = 'none';
-
-        downloadBtn.innerHTML = '✅ 下载完成';
-        downloadBtn.disabled = false;
-
-        saveTips.classList.add('show');
-        saveBtn.style.display = 'block';
-
-        showToast('✅ 下载完成！点分享按钮保存到相册');
-
-        // 释放 blob
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
-
-    } catch (err) {
-        // 备选方案：直接打开视频链接
-        console.error('Blob下载失败，尝试直接打开:', err);
-        downloadBtn.innerHTML = '⬇️ 直接打开视频';
-        downloadBtn.disabled = false;
-
-        // 构建一个新窗口
-        window.open(videoData.videoUrl, '_blank');
-        saveTips.classList.add('show');
-        showToast('视频已在新窗口打开，点分享按钮保存');
-    }
+    downloadBtn.innerHTML='✅ 下载完成';
+    downloadBtn.disabled=false;
+    saveTips.classList.add('show');
+    toastMsg('✅ 下载完成！长按视频保存到相册');
+    setTimeout(function(){URL.revokeObjectURL(blobUrl);},120000);
+  }).catch(function(e){
+    console.error('下载失败:',e);
+    window.open(videoData.videoUrl,'_blank');
+    downloadBtn.innerHTML='⬇️ 重试下载';
+    downloadBtn.disabled=false;
+    saveTips.classList.add('show');
+    toastMsg('已在新窗口打开，点分享保存');
+  });
 }
 
-// ============================================================
-// 重新保存
-// ============================================================
-function retrySave() {
-    if (videoData?.videoUrl) {
-        window.open(videoData.videoUrl, '_blank');
-        showToast('已重新打开视频，点分享→存储视频');
-    }
+// 工具函数
+function setLoading(on,txt){
+  if(on){parseBtn.disabled=true;parseBtn.innerHTML='<span class="spinner"></span>'+txt;progressWrap.classList.add('show');}
+  else{parseBtn.disabled=false;parseBtn.innerHTML='🔍 解析视频';progressWrap.classList.remove('show');}
 }
-
-// ============================================================
-// 添加到主屏幕提示
-// ============================================================
-function showInstallTip() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (isIOS) {
-        alert('📲 添加到主屏幕：\n\n① 点浏览器底部中间的「分享」按钮\n② 往下滑找到「添加到主屏幕」\n③ 点右上角「添加」\n\n之后就像 App 一样使用了！');
-    } else {
-        alert('📲 在浏览器菜单中选择「添加到主屏幕」即可');
-    }
-}
-
-// ============================================================
-// 键盘回车触发解析
-// ============================================================
-linkInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && e.metaKey) {
-        parseVideo();
-    }
-});
-
-// ============================================================
-// 页面加载完成
-// ============================================================
-console.log('📹 抖音/TikTok 无水印视频下载器');
-console.log('✅ 粘贴链接 → 解析 → 下载 → 分享按钮保存到相册');
-console.log('💡 添加到主屏幕，像 App 一样使用');
-
-// 如果 URL 带有分享参数，自动处理
-const params = new URLSearchParams(window.location.search);
-const shareUrl = params.get('url');
-if (shareUrl) {
-    linkInput.value = shareUrl;
-    parseVideo();
+function showErr(m){errorMsg.textContent=m;errorMsg.classList.add('show');}
+function hideErr(){errorMsg.classList.remove('show');}
+function toastMsg(m,d){d=d||2500;toast.textContent=m;toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},d);}
+function pasteLink(){
+  try{navigator.clipboard.readText().then(function(t){if(t){linkInput.value=t;toastMsg('✅ 已粘贴');}else toastMsg('剪贴板为空');});}
+  catch(e){toastMsg('请手动粘贴链接');}
 }
 </script>
-
 </body>
 </html>
